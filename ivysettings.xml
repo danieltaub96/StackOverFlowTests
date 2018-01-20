@@ -1,0 +1,15 @@
+<ivysettings>
+    <property name="ivy.organisation" value="StackOverflowTests"/>
+    <property name="ivy.module" value="StackOverflowTests"/>
+
+    <property name="revision" value="2.13"/>
+
+    <property name="repo.dir" value="/Users/daniel/Downloads"/>
+    <settings defaultResolver="internal"/>
+    <resolvers>
+        <filesystem name="internal">
+            <ivy pattern="${repo.dir}/[module]/ivy-[revision].xml" />
+            <artifact pattern="${repo.dir}/[module]/[artifact]-[revision].[ext]" />
+        </filesystem>
+    </resolvers>
+</ivysettings>

@@ -1,0 +1,6 @@
+<ivy-module version="2.0">
+    <info organisation="daniel" module="hello"/>
+    <publications>
+        <artifact name="English" ext="txt" type="doc"/>
+    </publications>
+</ivy-module>
