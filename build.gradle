@@ -1,4 +1,4 @@
-group 'StackOverflowTests'
+group 'stackoverflow.tests'
 version '1.0'
 
 apply plugin: 'java'
@@ -12,38 +12,53 @@ repositories {
 
     mavenCentral()
 
+    mavenLocal()
+
     flatDir {
         dirs '/Users/daniel/.ant/lib'
 
     }
 }
 
-
 buildscript {
     repositories {
         maven {
             url "https://plugins.gradle.org/m2/"
         }
+
+        mavenCentral()
+
     }
     dependencies {
+        classpath "net.ltgt.gradle:gradle-apt-plugin:0.13"
         classpath "org.springframework.boot:spring-boot-gradle-plugin:1.5.9.RELEASE"
     }
 }
 
-apply plugin: "org.springframework.boot"
+
+apply plugin: "net.ltgt.apt"
+//apply plugin: "org.springframework.boot"
 
 
-
+configurations {
+    daniel
+}
 dependencies {
+
+
+    apt group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
+
+    apt group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.2.0.Final'
+    compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version: '1.2.0.Final'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
     compileOnly 'javax.annotation:jsr250-api:1.0'
     compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.3'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.3'
-    compile group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
     compile 'com.sparkjava:spark-core:2.7.1'
     compile 'log4j:log4j:1.2.17'
     testCompile group: 'junit', name: 'junit', version: '4.12'
@@ -51,6 +66,15 @@ dependencies {
     // compile group: 'org.springframework', name: 'spring-webmvc', version: '4.1.3.RELEASE'
     testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.9.RELEASE'
 }
+
+
+
+dependencies {
+   // daniel ':stackoverflow.tests:+'
+
+    daniel 'com.squareup.moshi:moshi:+'
+}
+
 
 // ********* Package number of modules ***********//
 //
@@ -96,7 +120,8 @@ publishing {
         }
     }
     repositories {
-        mavenLocal()
+        mavenCentral()
+
     }
 }
 
@@ -181,40 +206,120 @@ publishing {
 //task oldJar(dependsOn: oldJarTask)
 
 
-configurations {
-    ivyJar
-}
+//configurations {
+//    api
+//    compile.extendsFrom(api)
+//
+//}
 
 
-def ivyDir = new File("build/ivy/")
-ivyDir.mkdirs()
+//task packAllToJar (type : Jar){
+//    // pack yours main module
+//    from sourceSets.main.output
+//
+//
+//    // pack your other "Api" module
+//    from {
+//        configurations.api.collect { it.isDirectory() ? it : zipTree(it) }
+//    }
+//
+//    // pack all dependencies in the root project
+//    from configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
+//
+//    // Set name and version
+//    version = "1.0"
+//    baseName = "customJarName"
+//}
 
-def file = new File("build/ivy/build.xml")
-if (!file.exists()) {
-    new URL('http://localhost:8080/build.xml').withInputStream { i -> file.withOutputStream { it << i } }
-}
+
+//
+//def ivyDir = new File("build/ivy/")
+//ivyDir.mkdirs()
+//
+//def file = new File("build/ivy/build.xml")
+//if (!file.exists()) {
+//    new URL('http://localhost:8080/build.xml').withInputStream { i -> file.withOutputStream { it << i } }
+//}
+//
+//
+//
+//ant.importBuild 'build/ivy/build.xml'
+//ant.properties['ivy.revision'] = "2."
+//ant.properties['ivy.group'] = group
+//ant.properties['ivy.name'] = name
+//
+//
+//
+//task downloadIvy() {
+//    def f = new File("build/ivy/ivy.jar")
+//    if (!f.exists()) {
+//        new URL('file:///Users/daniel/.ant/lib/ivy.jar').withInputStream { i -> f.withOutputStream { it << i } }
+//    }
+//
+//}
+//
+//task getNextBuild(dependsOn: [downloadIvy, ivyBuildNumber]) {
+//    doLast {
+//        def nextVersion = ant.properties['ivy.new.revision']
+//        println nextVersion
+//    }
+//}
+//
+
+//  cmd exit code
+//task executeScript(type : Exec) {
+//    commandLine 'sh', 'run.sh', 'hello world'
+//    ignoreExitValue true
+//
+//
+//    doLast {
+//        if(execResult.exitValue == 0) {
+//            print "Success"
+//        } else {
+//            print "Fail"
+//        }
+//    }
+//}
+
+//
+//buildscript {
+//    repositories {
+//        maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+//    }
+//    dependencies {
+//        classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:2.6.1"
+//    }
+//}
+//
+//apply plugin: "org.sonarqube"
 
 
-
-ant.importBuild 'build/ivy/build.xml'
-ant.properties['ivy.revision'] = "2."
-ant.properties['ivy.group'] = group
-ant.properties['ivy.name'] = name
+task ver (type : Exec){
+    commandLine './run.sh'
+    ignoreExitValue true
 
 
-
-task downloadIvy() {
-    def f = new File("build/ivy/ivy.jar")
-    if (!f.exists()) {
-        new URL('file:///Users/daniel/.ant/lib/ivy.jar').withInputStream { i -> f.withOutputStream { it << i } }
-    }
-
-}
-
-task getNextBuild(dependsOn: [downloadIvy, ivyBuildNumber]) {
     doLast {
-        def nextVersion = ant.properties['ivy.new.revision']
-        println nextVersion
     }
 }
 
+
+task buildscriptDependencies(type: DependencyReportTask) {
+    outputFile = new File("text.txt")
+
+    doLast {
+        def text = new File("text.txt").text
+
+        text = text.split("daniel")
+        text = text[1].split("\n")[1].split(":")[2].replace(" -> project ", "")
+        def ver = text as Double
+
+        println ver + 1
+    }
+}
+
+task printClasspath {
+    println version
+}

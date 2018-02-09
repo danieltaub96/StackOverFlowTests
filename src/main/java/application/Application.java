@@ -14,18 +14,9 @@ import static org.springframework.boot.SpringApplication.run;
  */
 @SpringBootApplication
 public class Application {
-    @Autowired
-    private Environment environment;
+
     public static void main(String[] args) {
         new SpringApplicationBuilder(Application.class)
-                .properties("spring.config.name:conf")
-                .build()
                 .run(args);
-    }
-
-    @PostConstruct
-    private void init(){
-        System.out.println(environment.getProperty("spring.config.name"));
-
     }
 }
