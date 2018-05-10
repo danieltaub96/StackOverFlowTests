@@ -1,5 +1,5 @@
 group 'stackoverflow.tests'
-version '1.0'
+version '2.1'
 
 apply plugin: 'java'
 apply plugin: 'maven'
@@ -36,6 +36,8 @@ buildscript {
 }
 
 
+
+
 apply plugin: "net.ltgt.apt"
 //apply plugin: "org.springframework.boot"
 
@@ -44,35 +46,50 @@ configurations {
     daniel
 }
 dependencies {
-
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.11.0'
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: '2.11.0'
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter-web', version: '2.0.0.RELEASE'
 
     apt group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
+    testCompile group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 
     apt group: 'org.mapstruct', name: 'mapstruct-processor', version: '1.2.0.Final'
     compile group: 'org.mapstruct', name: 'mapstruct-jdk8', version: '1.2.0.Final'
     compile group: 'commons-cli', name: 'commons-cli', version: '1.4'
 
-    compileOnly 'javax.annotation:jsr250-api:1.0'
-    compile group: 'javax.inject', name: 'javax.inject', version: '1'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.9.3'
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.16.20'
 
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.9.3'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.9.3'
     compile 'com.sparkjava:spark-core:2.7.1'
-    compile 'log4j:log4j:1.2.17'
     testCompile group: 'junit', name: 'junit', version: '4.12'
-    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.4.3.RELEASE'
-    // compile group: 'org.springframework', name: 'spring-webmvc', version: '4.1.3.RELEASE'
-    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.9.RELEASE'
+
+    compile group: 'org.springframework.boot', name: 'spring-boot-starter', version: '1.5.10.RELEASE'
+
+    compile 'org.hibernate:hibernate-validator:5.3.6.Final'
+    compile "com.fasterxml.jackson.module:jackson-module-jsonSchema:2.9.0"
+
+    compile (group: 'org.springframework.boot', name: 'spring-boot-starter-data-jpa', version: '2.0.0.RELEASE'){
+        exclude group : 'spring-boot-starter-logging'
+    }
+    runtime group: 'com.h2database', name: 'h2', version: '1.4.197'
+    compile group: 'org.postgresql', name: 'postgresql', version: '42.2.1.jre7'
+
+    compile 'redis.clients:jedis:2.9.0'
+
+    compile 'com.github.dubasdey:log4j2-jsonevent-layout:0.0.4'
+    compile 'org.springframework.data:spring-data-redis:2.0.3.RELEASE'
+    testCompile group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '1.5.10.RELEASE'
 }
+apply plugin: 'application'
 
+mainClassName = 'Main'
 
-
-dependencies {
-   // daniel ':stackoverflow.tests:+'
-
-    daniel 'com.squareup.moshi:moshi:+'
+jar {
+    manifest {
+        attributes('Main-Class': 'server.NTPServer')
+    }
 }
 
 
@@ -205,13 +222,11 @@ publishing {
 //// create a task to tun the plain old good jar task from gradle :)
 //task oldJar(dependsOn: oldJarTask)
 
-
 //configurations {
 //    api
 //    compile.extendsFrom(api)
 //
 //}
-
 
 //task packAllToJar (type : Jar){
 //    // pack yours main module
@@ -230,7 +245,6 @@ publishing {
 //    version = "1.0"
 //    baseName = "customJarName"
 //}
-
 
 //
 //def ivyDir = new File("build/ivy/")
@@ -296,7 +310,7 @@ publishing {
 //apply plugin: "org.sonarqube"
 
 
-task ver (type : Exec){
+task ver(type: Exec) {
     commandLine './run.sh'
     ignoreExitValue true
 
@@ -320,6 +334,44 @@ task buildscriptDependencies(type: DependencyReportTask) {
     }
 }
 
-task printClasspath {
-    println version
-}
+//task printPmdVersion {
+//    doLast {
+//        FileTree dep = zipTree(configurations.daniel.filter {
+//            dep -> dep.name.contains(project.group)
+//        }.singleFile)
+//
+//        def lastVersion = dep.toString().split("-")[1].replace(".jar'", "")
+//
+//
+//        def lastParts = lastVersion.split("\\.")
+//        def curVersionParts = version.split("\\.")
+//
+//        def newVersion = ""
+//
+//        def isNewRevision = lastParts.size() == curVersionParts.size()
+//
+//        def index = lastParts.size() == curVersionParts.size() ? lastParts.size() - 1 : lastParts.size() - 2
+//
+//        0.upto(index) {
+//            def num1 = lastParts[it]
+//            def num2 = curVersionParts[it]
+//
+//            if (num1 != num2) {
+//                newVersion += num2 + "."
+//            } else {
+//                newVersion += num1 + "."
+//            }
+//        }
+//
+//        def revision = "0"
+//
+//        if (!isNewRevision) {
+//            revision = lastParts[lastParts.size() - 1] as Integer
+//            ++revision
+//        }
+//
+//        newVersion += revision
+//
+//        println newVersion
+//    }
+//}
